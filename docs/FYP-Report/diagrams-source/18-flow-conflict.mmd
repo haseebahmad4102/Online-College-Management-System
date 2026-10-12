@@ -1,0 +1,24 @@
+flowchart LR
+  classDef io fill:#dff0d8,stroke:#3c763d
+  classDef dec fill:#fdf2e3,stroke:#b7791f
+  classDef proc fill:#eef3fb,stroke:#31708f
+  classDef err fill:#fdecea,stroke:#a94442
+
+  A([checkConflict<br/>day, timeSlotId, roomId,<br/>teacherId, classSectionId]):::io
+  B["Fetch timetable_entries for the same day whose<br/>room, teacher or class section matches,<br/>excluding the entry being edited"]:::proc
+  C["Keep only entries whose slot OVERLAPS in wall-clock time:<br/>a.startTime &lt; b.endTime AND b.startTime &lt; a.endTime<br/><br/>Overlap is tested on time, not on slot id, so a clash<br/>between two different but overlapping slots is caught"]:::proc
+  D{"Same teacher<br/>in an overlapping slot?"}:::dec
+  E([Teacher conflict - names the subject,<br/>section, room, day and slot]):::err
+  F{"Same room?"}:::dec
+  G([Room conflict]):::err
+  H{"Same class section?"}:::dec
+  I([Class shift conflict]):::err
+  J([Return null - the entry<br/>may be saved]):::io
+
+  A --> B --> C --> D
+  D -- yes --> E
+  D -- no --> F
+  F -- yes --> G
+  F -- no --> H
+  H -- yes --> I
+  H -- no --> J

@@ -1,0 +1,44 @@
+graph TB
+  classDef ext fill:#dff0d8,stroke:#3c763d,stroke-width:2px
+  classDef proc fill:#eef3fb,stroke:#31708f,stroke-width:2px
+  classDef store fill:#fdf2e3,stroke:#b7791f
+
+  STU([Student]):::ext
+  TEA([Teacher]):::ext
+  CLK([Clerk]):::ext
+  LIB([Librarian]):::ext
+  TTB([Timetable In-charge]):::ext
+  MGT([Principal/Admin]):::ext
+
+  P5[5.0<br/>Manage Academic<br/>Operations]:::proc
+  P6[6.0<br/>Manage Student<br/>Lifecycle]:::proc
+  P7[7.0<br/>Manage Library<br/>Circulation]:::proc
+
+  D5[(D5 students / class_sections)]:::store
+  D6[(D6 attendance / assessments / classwork)]:::store
+  D7[(D7 books / requests / issues)]:::store
+  D8[(D8 audit_logs)]:::store
+  D9[(D9 allocations / timetable_entries)]:::store
+
+  TEA -->|attendance, marks, classwork| P5
+  P5 <--> D6
+  P5 <--> D9
+  TTB -->|timetable entries| P5
+  P5 -->|conflict warning| TTB
+  STU -->|submissions, quiz answers| P5
+  P5 -->|attendance %, marks, timetable| STU
+
+  CLK -->|assign shift, promote batch, set status| P6
+  P6 <--> D5
+  P6 -->|carry papers| D5
+  P6 -->|promotion notice| STU
+
+  STU -->|book request| P7
+  LIB -->|approve, issue, return| P7
+  P7 <--> D7
+  P7 -->|fine amount| STU
+
+  P5 -.-> D8
+  P6 -.-> D8
+  P7 -.-> D8
+  D8 -->|audit trail| MGT

@@ -1,0 +1,68 @@
+sequenceDiagram
+  autonumber
+  actor A as Applicant
+  participant UI as React Portal
+  participant API as Express API
+  participant EL as eligibility.service
+  participant ME as merit.service
+  participant CH as challan.service
+  participant DB as MySQL (Prisma)
+  actor C as Clerk
+
+  A->>UI: Register account
+  UI->>API: POST /api/auth/register
+  API->>DB: create user + applicant role
+  API-->>UI: JWT token
+
+  A->>UI: Apply wizard steps 1-3
+  UI->>API: POST /api/admissions/check-eligibility
+  API->>EL: checkEligibility(program, group, marks)
+  EL->>DB: read program_eligibilities, min_percentage
+  EL-->>API: eligible / reason
+  API-->>UI: eligibility result
+
+  A->>UI: Upload required documents (step 4)
+  UI->>API: POST /api/admissions/:id/documents
+  API->>DB: store application_documents (private storage)
+
+  A->>UI: Review and submit (step 5)
+  UI->>API: POST /api/admissions/applications
+  API->>DB: application status = submitted
+  API-->>A: notification "Application received"
+
+  C->>UI: Open verification queue
+  UI->>API: GET /api/admissions/queue
+  C->>UI: Verify each document
+  UI->>API: PUT /api/admissions/documents/:id/verify
+  API->>DB: document status = verified
+  API->>DB: application status = verified
+
+  C->>UI: Generate merit list
+  UI->>API: POST /api/merit/generate
+  API->>ME: generateMeritList(cycle, program, seats)
+  ME->>DB: read verified + waitlisted pool
+  ME->>ME: score = 0.30*matric% + 0.70*inter% (+Hafiz bonus)
+  ME->>ME: sort by score, inter%, matric%, dob, application_no
+  ME->>DB: create merit_list + merit_list_entries
+  ME-->>API: list created
+  C->>UI: Publish list
+  UI->>API: PUT /api/merit/:id/publish
+  API->>DB: entries selected / waitlisted
+  API-->>A: notification "You are selected"
+
+  API->>CH: issueChallan(application)
+  CH->>DB: create challan + challan_items
+  A->>UI: Download challan
+  A->>A: Pay at Bank of Punjab, obtain counterfoil
+
+  C->>UI: Verify paid challan
+  UI->>API: PUT /api/challans/:id/verify
+  API->>CH: verifyChallan(challanId, clerkUserId)
+  CH->>DB: BEGIN TRANSACTION
+  CH->>CH: generateRollNumber(program, session)
+  CH->>DB: create student record
+  CH->>DB: grant student role, drop applicant role
+  CH->>DB: application status = enrolled
+  CH->>DB: merit entry status = admitted
+  CH->>DB: COMMIT
+  CH-->>A: notification "Admission confirmed, roll no issued"

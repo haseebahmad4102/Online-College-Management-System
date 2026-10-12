@@ -1,0 +1,33 @@
+flowchart LR
+  classDef io fill:#dff0d8,stroke:#3c763d
+  classDef dec fill:#fdf2e3,stroke:#b7791f
+  classDef proc fill:#eef3fb,stroke:#31708f
+  classDef skip fill:#fdecea,stroke:#a94442
+
+  A([POST /promotion/run<br/>programId, sessionId,<br/>termNo, promotions]):::io
+  B["finalTerm from program;<br/>isFinal = termNo &gt;= finalTerm;<br/>maxCarry = promotion.max_carry"]:::proc
+  C["Load batch by student's own<br/>programId + academicSessionId,<br/>then keep those whose section<br/>term_no = termNo and status = active"]:::proc
+  D{"Any eligible<br/>student?"}:::dec
+  E([422 - all inactive, or no<br/>class shift assigned yet]):::io
+  F[Validate each requested promotion]:::proc
+  G{"In the eligible set?"}:::dec
+  H[Skip: not an active student<br/>of this semester]:::skip
+  I{"carry subjects<br/>&gt; maxCarry?"}:::dec
+  J[Skip: must repeat the semester]:::skip
+  K{"all carry subjects<br/>belong to this term?"}:::dec
+  L[Skip: subject not of this semester]:::skip
+  M{"final term with<br/>pending papers?"}:::dec
+  N[Skip: cannot pass out<br/>with pending papers]:::skip
+  O([Validated jobs list passed to<br/>the transaction phase<br/>continued in the next figure]):::io
+
+  A --> B --> C --> D
+  D -- no --> E
+  D -- yes --> F --> G
+  G -- no --> H
+  G -- yes --> I
+  I -- yes --> J
+  I -- no --> K
+  K -- no --> L
+  K -- yes --> M
+  M -- yes --> N
+  M -- no --> O

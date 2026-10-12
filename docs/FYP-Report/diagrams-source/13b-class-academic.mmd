@@ -1,0 +1,55 @@
+classDiagram
+  direction TB
+
+  class Program {
+    +Int id
+    +String code
+    +ProgramLevel level
+    +Int totalSemesters
+    +Int seats
+    +Decimal minPercentage
+    +finalTerm() Int
+  }
+
+  class ClassSection {
+    +Int id
+    +Int termNo
+    +String name
+    +Shift shift
+    +Int capacity
+    +isFull() Boolean
+  }
+
+  class Subject {
+    +Int id
+    +Int termNo
+    +String code
+    +String title
+  }
+
+  class Teacher {
+    +BigInt id
+    +String cnic
+    +TeacherType teacherType
+    +Date joiningDate
+  }
+
+  class Allocation {
+    +BigInt id
+    +Int classSectionId
+    +Int subjectId
+    +BigInt teacherId
+  }
+
+  class TimetableEntry {
+    +BigInt id
+    +Weekday day
+    +checkConflict() String
+  }
+
+  Program "1" -- "*" Subject : contains
+  Program "1" -- "*" ClassSection : runs
+  ClassSection "1" -- "*" Allocation : taught in
+  Subject "1" -- "*" Allocation : delivered as
+  Teacher "1" -- "*" Allocation : assigned
+  Allocation "1" -- "*" TimetableEntry : placed as

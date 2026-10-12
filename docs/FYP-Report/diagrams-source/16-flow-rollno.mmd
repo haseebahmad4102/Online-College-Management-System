@@ -1,0 +1,16 @@
+flowchart LR
+  classDef io fill:#dff0d8,stroke:#3c763d
+  classDef dec fill:#fdf2e3,stroke:#b7791f
+  classDef proc fill:#eef3fb,stroke:#31708f
+
+  A([generateRollNumber<br/>tx, program, session]):::io
+  B["Read settings:<br/>rollno.pattern = {YEAR}-{COLLEGE}-{DEPT}-{SEQ3}<br/>site.college_code = GGCM<br/>deptCode = department code, or GEN"]:::proc
+  C["seq = count of students already in this<br/>programme and session, plus one"]:::proc
+  D["Substitute tokens:<br/>{YEAR} to session.startYear<br/>{COLLEGE} to college code<br/>{DEPT} to department code<br/>{PROG} to programme code<br/>{SEQ3} to seq padded to three digits"]:::proc
+  E{"Roll number already<br/>taken by another student?"}:::dec
+  F["seq = seq + 1"]:::proc
+  G([Return unique roll number<br/>e.g. 2024-GGCM-ICS-001]):::io
+
+  A --> B --> C --> D --> E
+  E -- yes --> F --> D
+  E -- no --> G

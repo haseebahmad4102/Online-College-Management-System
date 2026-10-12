@@ -1,0 +1,39 @@
+classDiagram
+  direction TB
+
+  class Student {
+    +BigInt id
+    +String rollNumber
+    +StudentStatus status
+    +Date admittedOn
+    +promote(termNo) void
+    +setStatus(status) void
+  }
+
+  class StudentCarryForward {
+    +BigInt id
+    +Int fromTermNo
+    +CarryStatus status
+    +clear(userId) void
+  }
+
+  class BookIssue {
+    +BigInt id
+    +Date dueDate
+    +Decimal finePerDay
+    +Decimal fineAmount
+    +computeFine(returnedOn, grace) Decimal
+  }
+
+  class Challan {
+    «see Fig 3.10»
+  }
+
+  class Subject {
+    «see Fig 3.7»
+  }
+
+  Student "1" -- "*" StudentCarryForward : carries
+  Subject "1" -- "*" StudentCarryForward : failed
+  Student "1" -- "*" BookIssue : borrows
+  Student "1" -- "*" Challan : billed by

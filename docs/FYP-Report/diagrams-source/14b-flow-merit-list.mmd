@@ -1,0 +1,30 @@
+flowchart LR
+  classDef io fill:#dff0d8,stroke:#3c763d
+  classDef dec fill:#fdf2e3,stroke:#b7791f
+  classDef proc fill:#eef3fb,stroke:#31708f
+
+  A([Ranked applications from<br/>the scoring phase]):::io
+  B[BEGIN TRANSACTION]:::proc
+  C["Create merit_lists row<br/>listNo, seats, generatedBy"]:::proc
+  D[For each ranked application]:::proc
+  E{"position &lt;= seats?"}:::dec
+  F["status = selected"]:::proc
+  G["status = waitlisted"]:::proc
+  H["Create merit_list_entries row<br/>position, score, status"]:::proc
+  I[COMMIT]:::proc
+  J{"Clerk publishes<br/>the list?"}:::dec
+  K["List stays draft -<br/>not visible to applicants"]:::proc
+  L["published_at set;<br/>notify selected and<br/>waitlisted applicants"]:::proc
+  M["Selected applicants receive<br/>an admission challan"]:::proc
+  N{"Challan unpaid<br/>by due date?"}:::dec
+  O["Entry status = forfeited;<br/>seat released to the<br/>next merit list"]:::proc
+  P([Seat filled -<br/>entry status = admitted<br/>on challan verification]):::io
+
+  A --> B --> C --> D --> E
+  E -- yes --> F --> H
+  E -- no --> G --> H
+  H --> I --> J
+  J -- no --> K
+  J -- yes --> L --> M --> N
+  N -- yes --> O
+  N -- no --> P

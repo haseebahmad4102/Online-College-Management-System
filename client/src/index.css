@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+/* GGCM theme tokens (§9) — drawn from the college crest.
+   The Principal's color settings overwrite these variables at runtime. */
+:root {
+  --ggcm-primary: #14532d;
+  --ggcm-primary-dark: #0d3b1f;
+  --ggcm-primary-light: #1c7a42;
+  --ggcm-accent: #9f1239;
+  --ggcm-gold: #b7791f;
+}
+
+@theme inline {
+  --color-primary: var(--ggcm-primary);
+  --color-primary-dark: var(--ggcm-primary-dark);
+  --color-primary-light: var(--ggcm-primary-light);
+  --color-accent: var(--ggcm-accent);
+  --color-gold: var(--ggcm-gold);
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-urdu: 'Noto Nastaliq Urdu', serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.font-urdu {
+  font-family: var(--font-urdu);
+}
+
+/* ── Printing (§5.5/§5.6): when a .print-area exists, print ONLY that document,
+   top-left on a single A4 page — never the portal sidebar/header around it. */
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+@media print {
+  body:has(.print-area) * {
+    visibility: hidden;
+  }
+  body:has(.print-area) .print-area,
+  body:has(.print-area) .print-area * {
+    visibility: visible;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  body:has(.print-area) .print-area {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: 100%;
+    margin: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* ID-card documents keep their real card size instead of stretching to A4 width */
+  body:has(.print-area) .print-area.print-card {
+    width: 420px; /* ≈ 11 cm — realistic laminated-card size */
+  }
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.ticker-track {
+  animation: ticker-scroll 30s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Homepage animations — motion only, the color scheme stays untouched ── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(26px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0) }
+  50% { transform: translateY(-20px) }
+}
+
+/* Hero slide text re-animates on every slide change (keyed remount) */
+.hero-swap {
+  animation: fade-up 0.65s ease both;
+}
+
+/* Soft floating shapes behind the hero */
+.float-blob {
+  animation: float-y 7s ease-in-out infinite;
+}
+.float-blob-slow {
+  animation: float-y 11s ease-in-out infinite;
+}
+
+/* ── Stylish white homepage bands ─────────────────────────────────────────
+   Decorative pattern layers used inside the white sections. They are painted
+   on absolutely-positioned layers (pointer-events: none) with a radial mask,
+   so they clearly show through the middle and melt away toward the edges. */
+.pattern-dots {
+  background-image: radial-gradient(circle, rgba(20, 83, 45, 0.13) 1.6px, transparent 1.7px);
+  background-size: 26px 26px;
+}
+
+.pattern-grid {
+  background-image:
+    linear-gradient(rgba(20, 83, 45, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 83, 45, 0.08) 1px, transparent 1px);
+  background-size: 38px 38px;
+}
+
+/* Slow, gentle drift for the big soft color blobs behind the white bands. */
+@keyframes blob-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(24px, -18px) scale(1.06); }
+}
+.blob-drift {
+  animation: blob-drift 14s ease-in-out infinite;
+}
+.blob-drift-slow {
+  animation: blob-drift 20s ease-in-out infinite reverse;
+}
+
+/* Scroll-reveal: sections rise in as they enter the viewport.
+   .reveal-in ends on transform:none so hover popovers keep clean stacking. */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .hero-swap {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none;
+    animation: none;
+  }
+  .float-blob, .float-blob-slow, .ticker-track, .blob-drift, .blob-drift-slow {
+    animation: none;
+  }
+}

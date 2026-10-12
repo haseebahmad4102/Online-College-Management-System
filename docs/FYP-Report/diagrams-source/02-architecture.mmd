@@ -1,0 +1,39 @@
+graph TB
+  classDef comp fill:#eef3fb,stroke:#31708f
+  classDef store fill:#fdf2e3,stroke:#b7791f
+  classDef mw fill:#f2e8f7,stroke:#7b4397
+
+  subgraph PRES["PRESENTATION TIER - React 19 SPA (Vite 8, Tailwind CSS 4)"]
+    direction LR
+    P1[Public Website<br/>SiteLayout - 11 pages]:::comp
+    P2[Role Portals<br/>PortalLayout - 42 pages]:::comp
+    P3[AuthContext<br/>JWT in sessionStorage]:::comp
+    P4[api/client.js<br/>Axios interceptor]:::comp
+  end
+
+  subgraph APPL["APPLICATION TIER - Node.js 24 / Express 5"]
+    direction LR
+    MW["MIDDLEWARE CHAIN<br/>rateLimit - 300 req/min/IP<br/>authenticate - JWT verify<br/>can() / authorize() - RBAC<br/>audit - logs every mutation<br/>upload - multer MIME whitelist"]:::mw
+    R1["22 ROUTE MODULES<br/>220 REST Endpoints<br/>auth, admissions, merit,<br/>challans, students, promotion,<br/>attendance, assessments,<br/>classwork, timetable, library,<br/>academic, admin, settings"]:::comp
+    S1["9 SERVICE MODULES<br/>merit.service<br/>challan.service<br/>eligibility.service<br/>conflict.service<br/>fine.service<br/>notify.service<br/>hod, password, settings"]:::comp
+  end
+
+  subgraph DATA["DATA TIER"]
+    direction LR
+    D2[Prisma ORM 6<br/>20 migrations]:::comp
+    D1[(MySQL 8 - ggcm_ocms<br/>53 tables, 23 enums)]:::store
+    D3[(storage/private<br/>application documents)]:::store
+    D4[(storage/public<br/>photos and site images)]:::store
+  end
+
+  P1 --> P4
+  P2 --> P4
+  P3 --> P4
+  P4 -->|HTTPS JSON + Bearer token| MW
+  MW --> R1
+  R1 --> S1
+  R1 --> D2
+  S1 --> D2
+  D2 -->|SQL| D1
+  MW --> D3
+  MW --> D4

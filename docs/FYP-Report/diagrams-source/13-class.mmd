@@ -1,0 +1,158 @@
+classDiagram
+  direction TB
+
+  class User {
+    +BigInt id
+    +String name
+    +String email
+    +String password
+    +Boolean mustChangePassword
+    +Boolean isActive
+    +authenticate(token) User
+    +can(permission) Boolean
+  }
+
+  class Role {
+    +Int id
+    +String name
+  }
+
+  class Permission {
+    +Int id
+    +String name
+    +String group
+    +String label
+  }
+
+  class Student {
+    +BigInt id
+    +String rollNumber
+    +StudentStatus status
+    +Date admittedOn
+    +promote(termNo) void
+    +setStatus(status) void
+  }
+
+  class Teacher {
+    +BigInt id
+    +String cnic
+    +TeacherType teacherType
+    +Date joiningDate
+  }
+
+  class Application {
+    +BigInt id
+    +String applicationNo
+    +Boolean isHafiz
+    +Decimal meritScore
+    +ApplicationStatus status
+    +checkEligibility() Result
+    +computeMeritScore() Decimal
+  }
+
+  class Program {
+    +Int id
+    +String code
+    +ProgramLevel level
+    +Int totalSemesters
+    +Int seats
+    +Decimal minPercentage
+    +finalTerm() Int
+  }
+
+  class ClassSection {
+    +Int id
+    +Int termNo
+    +String name
+    +Shift shift
+    +Int capacity
+    +isFull() Boolean
+  }
+
+  class Subject {
+    +Int id
+    +Int termNo
+    +String code
+    +String title
+  }
+
+  class Allocation {
+    +BigInt id
+    +Int classSectionId
+    +Int subjectId
+    +BigInt teacherId
+  }
+
+  class Challan {
+    +BigInt id
+    +String challanNo
+    +ChallanPurpose purpose
+    +Decimal totalAmount
+    +ChallanStatus status
+    +verify(clerkId) Student
+  }
+
+  class MeritList {
+    +Int id
+    +Int listNo
+    +Int seats
+    +generate() MeritListEntry[]
+    +publish() void
+  }
+
+  class StudentCarryForward {
+    +BigInt id
+    +Int fromTermNo
+    +CarryStatus status
+    +clear(userId) void
+  }
+
+  class BookIssue {
+    +BigInt id
+    +Date dueDate
+    +Decimal finePerDay
+    +Decimal fineAmount
+    +computeFine(returnedOn, grace) Decimal
+  }
+
+  class TimetableEntry {
+    +BigInt id
+    +Weekday day
+    +checkConflict() String
+  }
+
+  class AuditLog {
+    +BigInt id
+    +String method
+    +String path
+    +String action
+    +Int status
+    +String ip
+  }
+
+  User "1" -- "*" Role : holds
+  Role "*" -- "*" Permission : granted
+  User "1" -- "*" Permission : direct grant
+  User "1" -- "0..1" Student : is
+  User "1" -- "0..1" Teacher : is
+  User "1" -- "*" AuditLog : performs
+
+  Application "1" -- "0..1" Student : becomes
+  Application "*" -- "1" Program : applies to
+  Application "1" -- "*" Challan : billed by
+  MeritList "1" -- "*" Application : ranks
+
+  Program "1" -- "*" Subject : contains
+  Program "1" -- "*" ClassSection : runs
+  Program "1" -- "*" Student : enrols
+
+  ClassSection "1" -- "*" Student : seats
+  ClassSection "1" -- "*" Allocation : taught in
+  Subject "1" -- "*" Allocation : delivered as
+  Teacher "1" -- "*" Allocation : assigned
+  Allocation "1" -- "*" TimetableEntry : placed as
+
+  Student "1" -- "*" StudentCarryForward : carries
+  Subject "1" -- "*" StudentCarryForward : failed
+  Student "1" -- "*" BookIssue : borrows
+  Student "1" -- "*" Challan : billed by

@@ -1,0 +1,17 @@
+flowchart LR
+  classDef io fill:#dff0d8,stroke:#3c763d
+  classDef dec fill:#fdf2e3,stroke:#b7791f
+  classDef proc fill:#eef3fb,stroke:#31708f
+
+  A([computeFine<br/>issue, returnedOn, graceDays]):::io
+  B["lateDays = floor((returnedOn - issue.dueDate) / one day)"]:::proc
+  C{"lateDays &gt; graceDays?"}:::dec
+  D["chargeable = 0"]:::proc
+  E["chargeable = lateDays - graceDays"]:::proc
+  F["fine = chargeable x issue.finePerDay<br/><br/>finePerDay was snapshotted onto the issue row<br/>when the book was lent, so a later change to<br/>library.fine_per_day never alters a loan<br/>already in progress"]:::proc
+  G([Return fine amount<br/>recorded with fine_status<br/>none, pending, paid or waived]):::io
+
+  A --> B --> C
+  C -- no --> D --> F
+  C -- yes --> E --> F
+  F --> G

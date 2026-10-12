@@ -1,0 +1,79 @@
+erDiagram
+  admission_cycles ||--o{ applications : "receives"
+  programs ||--o{ applications : "applied to"
+  users ||--o{ applications : "submits"
+  applications ||--o{ application_documents : "attaches"
+  document_types ||--o{ application_documents : "typed as"
+  admission_cycles ||--o{ merit_lists : "produces"
+  programs ||--o{ merit_lists : "for"
+  merit_lists ||--o{ merit_list_entries : "ranks"
+  applications ||--o{ merit_list_entries : "appears in"
+
+  admission_cycles {
+    int id PK
+    int academic_session_id FK
+    enum level
+    string title
+    datetime start_at
+    datetime end_at
+    enum status "draft|open|closed|merit|completed"
+    decimal merit_w_matric
+    decimal merit_w_inter
+    int hafiz_bonus
+  }
+  applications {
+    bigint id PK
+    string application_no UK
+    bigint user_id FK
+    int admission_cycle_id FK
+    int program_id FK
+    string name
+    string father_name
+    string cnic_bform
+    enum gender
+    date dob
+    string domicile_district
+    boolean is_hafiz
+    string matric_board
+    int matric_obtained
+    int matric_total
+    int inter_group_id FK
+    int inter_obtained
+    int inter_total
+    decimal merit_score
+    boolean eligibility_override
+    enum status "submitted|docs_rejected|verified|selected|waitlisted|challan_issued|fee_submitted|enrolled|forfeited|not_selected|rejected"
+    bigint verified_by FK
+  }
+  document_types {
+    int id PK
+    string name
+    enum applies_to "intermediate|bs|both"
+    boolean is_required
+  }
+  application_documents {
+    bigint id PK
+    bigint application_id FK
+    int document_type_id FK
+    string file_path
+    enum status "pending|verified|rejected"
+    string remarks
+  }
+  merit_lists {
+    int id PK
+    int admission_cycle_id FK
+    int program_id FK
+    int list_no
+    int seats
+    enum status "draft|published"
+    bigint generated_by FK
+    datetime published_at
+  }
+  merit_list_entries {
+    bigint id PK
+    int merit_list_id FK
+    bigint application_id FK
+    int position
+    decimal merit_score
+    enum status "selected|waitlisted|admitted|forfeited|not_selected"
+  }

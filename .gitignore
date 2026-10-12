@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/vendor/
+
+# Environment and secrets
+.env
+.env.backup
+.env.production
+*.env
+!.env.example
+server/.env
+server/.env.backup
+server/.env.production
+!server/.env.example
+
+# Build outputs
+client/dist/
+client/dist-ssr/
+server/public/build/
+server/public/hot/
+
+# Storage and logs
+server/storage/*.key
+server/storage/pail/
+server/storage/logs/*.log
+server/storage/framework/cache/data/*
+!server/storage/framework/cache/data/.gitignore
+server/storage/framework/views/*
+!server/storage/framework/views/.gitignore
+server/storage/framework/sessions/*
+!server/storage/framework/sessions/.gitignore
+server/storage/app/private/*
+!server/storage/app/private/.gitignore
+server/storage/app/public/applicants/*
+
+# Reports, presentations, spreadsheets (large / personal data)
+*.docx
+*.doc
+*.pptx
+*.ppt
+*.xlsx
+*.xls
+docs/FYP-Report/*.pdf
+docs/FYP-Report/*.docx
+docs/FYP-Report/*.pptx
+
+# IDE and OS files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+*.local
+.phpunit.result.cache
+
+# AI Tooling & analysis
+.claude/
+.codex-analysis/
+.codex/
+.cursor/

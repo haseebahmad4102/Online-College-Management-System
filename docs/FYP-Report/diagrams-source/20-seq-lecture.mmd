@@ -1,0 +1,41 @@
+sequenceDiagram
+  autonumber
+  actor T as Teacher
+  participant TU as TeacherLectures.jsx
+  participant API as lectures.routes.js
+  participant DB as MySQL (Prisma)
+  actor S as Student
+  participant SU as StudentLectures.jsx
+  participant PL as SecurePlayer.jsx
+  participant YT as youtube-nocookie.com
+
+  T->>T: Upload the recording to the college channel as UNLISTED
+  T->>TU: Paste the YouTube link, pick the class
+  TU->>API: POST /api/lectures
+  API->>API: extractYouTubeId() keeps the 11 characters only
+  API->>DB: verify the allocation belongs to this teacher
+  API->>DB: insert lecture (youtube_id stored, never a full URL)
+  API-->>S: notification "New recorded lecture"
+  API-->>TU: created — response carries NO youtube_id
+
+  S->>SU: Open Recorded Lectures
+  SU->>API: GET /api/lectures
+  API->>DB: published lectures of the student's own section
+  API-->>SU: titles, subjects, durations — still NO youtube_id
+  Note over API,SU: A student's browser never receives the id of a<br/>lecture they are not entitled to watch
+
+  S->>SU: Click a lecture
+  SU->>API: GET /api/lectures/:id/play
+  API->>DB: load lecture and its allocation
+  alt owning teacher, active student of that section, or principal
+    API-->>SU: youtube_id for this one lecture
+    SU->>PL: render with the id
+    PL->>YT: iframe youtube-nocookie/embed/ID<br/>rel=0, modestbranding=1, iv_load_policy=3
+    PL->>PL: block context menu and drag
+    PL->>PL: shield the title bar and the logo corner
+    YT-->>S: video plays
+  else any other viewer
+    API-->>SU: 403 "This lecture belongs to another class."
+  end
+
+  Note over PL,YT: Deterrence, not secrecy — a viewer who can play the<br/>video can still read the id from their own browser.<br/>True protection needs signed, expiring URLs.

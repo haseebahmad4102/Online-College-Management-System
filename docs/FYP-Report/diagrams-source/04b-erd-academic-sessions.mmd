@@ -1,0 +1,51 @@
+erDiagram
+  departments ||--o{ teachers : "employs"
+  designations ||--o{ teachers : "ranks"
+  academic_sessions ||--o{ class_sections : "spans"
+  academic_sessions ||--o{ admission_cycles : "opens"
+  academic_sessions ||--o{ allocations : "in"
+  class_sections ||--o{ allocations : "taught in"
+  subjects ||--o{ allocations : "delivered as"
+  teachers ||--o{ allocations : "assigned"
+
+  academic_sessions {
+    int id PK
+    string name UK
+    year start_year
+    year end_year
+    enum shift "morning|evening"
+    boolean is_current
+  }
+  class_sections {
+    int id PK
+    int program_id FK
+    int academic_session_id FK
+    tinyint term_no
+    char name
+    enum shift
+    int capacity
+    boolean is_active
+  }
+  allocations {
+    bigint id PK
+    int class_section_id FK
+    int subject_id FK
+    bigint teacher_id FK
+    int academic_session_id FK
+  }
+  teachers {
+    bigint id PK
+    bigint user_id FK
+    int department_id FK
+    int designation_id FK
+    string name
+    string cnic UK
+    enum teacher_type "permanent|cti|adhoc|visiting"
+    enum status
+    string qualification
+    date joining_date
+  }
+  designations {
+    int id PK
+    string title UK
+  }

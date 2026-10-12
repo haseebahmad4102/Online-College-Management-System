@@ -1,0 +1,56 @@
+erDiagram
+  applications ||--o| students : "becomes"
+  applications ||--o{ challans : "billed by"
+  students ||--o{ challans : "billed by"
+  challans ||--o{ challan_items : "itemised as"
+  programs ||--o{ students : "enrols"
+  class_sections ||--o{ students : "seats"
+  academic_sessions ||--o{ students : "batch of"
+  students ||--o{ student_carry_forwards : "carries"
+  subjects ||--o{ student_carry_forwards : "failed"
+
+  challans {
+    bigint id PK
+    string challan_no UK
+    bigint application_id FK
+    bigint student_id FK
+    int department_id FK
+    enum purpose "admission|semester|department|other"
+    decimal total_amount
+    date due_date
+    enum status "unpaid|paid|verified|rejected|expired|cancelled"
+    bigint verified_by FK
+    datetime verified_at
+  }
+  challan_items {
+    bigint id PK
+    bigint challan_id FK
+    string title
+    decimal amount
+  }
+  students {
+    bigint id PK
+    bigint user_id FK,UK
+    bigint application_id FK,UK
+    string roll_number UK
+    string registration_no
+    int program_id FK
+    int class_section_id FK
+    int academic_session_id FK
+    string name
+    string father_name
+    string cnic_bform UK
+    enum gender
+    date dob
+    enum status "active|inactive|passed_out|struck_off"
+    date admitted_on
+  }
+  student_carry_forwards {
+    bigint id PK
+    bigint student_id FK
+    int subject_id FK
+    tinyint from_term_no
+    enum status "pending|cleared"
+    bigint cleared_by FK
+    datetime cleared_at
+  }

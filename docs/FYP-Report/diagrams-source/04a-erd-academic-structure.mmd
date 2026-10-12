@@ -1,0 +1,59 @@
+erDiagram
+  departments ||--o{ programs : "offers"
+  inter_groups ||--o{ programs : "maps to (intermediate)"
+  programs ||--o{ subjects : "contains"
+  programs ||--o{ program_eligibilities : "accepts from"
+  inter_groups ||--o{ program_eligibilities : "eligible for"
+  programs ||--o{ program_fee_items : "priced by"
+  fee_heads ||--o{ program_fee_items : "used in"
+
+  departments {
+    int id PK
+    string name
+    string code UK
+    text about
+    string image_path
+    bigint hod_teacher_id FK
+  }
+  programs {
+    int id PK
+    int department_id FK
+    int inter_group_id FK
+    enum level "intermediate|bs"
+    string name
+    string code UK
+    tinyint duration_years
+    tinyint total_semesters
+    int seats
+    decimal min_percentage
+    boolean is_active
+  }
+  subjects {
+    int id PK
+    int program_id FK
+    tinyint term_no
+    string title
+    string code
+    tinyint credit_hours
+    boolean is_active
+  }
+  program_eligibilities {
+    int id PK
+    int program_id FK
+    int inter_group_id FK
+  }
+  fee_heads {
+    int id PK
+    string name
+    boolean is_refundable
+  }
+  program_fee_items {
+    int id PK
+    int program_id FK
+    int fee_head_id FK
+    decimal amount
+  }
+  inter_groups {
+    int id PK
+    string name UK
+  }

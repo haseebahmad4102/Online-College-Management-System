@@ -1,0 +1,46 @@
+erDiagram
+  users ||--o{ audit_logs : "performs"
+  users ||--o{ notifications : "receives"
+  committees ||--o{ committee_members : "has"
+  teachers ||--o{ committee_members : "serves on"
+
+  audit_logs {
+    bigint id PK
+    bigint user_id FK
+    string user_name
+    string user_roles
+    string method
+    string path
+    string action
+    int status
+    json summary
+    string ip
+    datetime created_at
+  }
+  notifications {
+    bigint id PK
+    bigint user_id FK
+    string type
+    string title
+    text body
+    string link
+    boolean is_read
+    datetime created_at
+  }
+  settings {
+    int id PK
+    string key UK
+    text value
+    string group
+  }
+  committees {
+    int id PK
+    string name
+    string purpose
+  }
+  committee_members {
+    int id PK
+    int committee_id FK
+    bigint teacher_id FK
+    string role
+  }

@@ -1,0 +1,64 @@
+sequenceDiagram
+  autonumber
+  actor C as Clerk / Principal
+  participant UI as Promotion.jsx
+  participant API as promotion.routes.js
+  participant ST as settings.service
+  participant DB as MySQL (Prisma)
+  actor S as Student
+
+  C->>UI: Select program and session (batch)
+  UI->>API: GET /api/promotion/preview?programId&sessionId
+  API->>DB: findMany students WHERE programId AND academicSessionId
+  Note over API,DB: Students are found by their OWN programme + session,<br/>not through class sections, so students with no shift<br/>assigned still appear instead of vanishing
+  API->>DB: findMany subjects WHERE programId AND isActive
+  API->>ST: getNumber('promotion.max_carry', 2)
+  API->>API: group students by classSection.termNo
+  API->>API: collect students with classSection = null
+  API-->>UI: { terms[], unassigned[], maxCarry, totals }
+  UI-->>C: One card per semester + "no class shift" warning card
+
+  opt Filter the view
+    C->>UI: Choose a semester / tick "pending papers only"
+    UI->>UI: filter client-side (full roll retained for promotion)
+  end
+
+  opt Change a student status
+    C->>UI: Click "change" on a student row
+    UI->>API: PUT /api/students/:id/status { status, reason }
+    API->>DB: update students.status
+    alt status = struck_off
+      API->>DB: users.is_active = false
+    else status = active
+      API->>DB: users.is_active = true
+    end
+    API-->>S: notification of status change
+  end
+
+  C->>UI: Untick students to detain, tick failed subjects
+  C->>UI: Press "Promote N student(s)"
+  UI->>API: POST /api/promotion/run { programId, sessionId, termNo, promotions[] }
+  API->>DB: reload batch and filter to active students of the term
+
+  loop validate every requested promotion
+    API->>API: carryIds.length > maxCarry ? skip (must repeat)
+    API->>API: carry subject not of this term ? skip
+    API->>API: final term with pending papers ? skip
+  end
+
+  API->>DB: BEGIN TRANSACTION
+  loop each validated student
+    alt final semester
+      API->>DB: student.status = passed_out
+    else
+      API->>DB: find-or-create section at term_no + 1
+      API->>DB: student.class_section_id = target section
+      API->>DB: upsert student_carry_forwards (status = pending)
+    end
+  end
+  API->>DB: deactivate source sections that emptied
+  API->>DB: COMMIT
+
+  API-->>S: notification "Promoted to Semester N+1" + carry papers
+  API-->>UI: { promoted, passedOut, detained, skipped[] }
+  UI-->>C: Summary and per-student skip reasons

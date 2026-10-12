@@ -1,0 +1,112 @@
+erDiagram
+  departments ||--o{ programs : "offers"
+  departments ||--o{ teachers : "employs"
+  departments ||--o{ department_fee_items : "charges"
+  departments ||--o{ department_gallery_images : "shows"
+  departments |o--|| teachers : "headed by (hod_teacher_id)"
+  inter_groups ||--o{ programs : "maps to (intermediate)"
+  programs ||--o{ subjects : "contains"
+  programs ||--o{ class_sections : "runs"
+  programs ||--o{ program_eligibilities : "accepts from"
+  inter_groups ||--o{ program_eligibilities : "eligible for"
+  programs ||--o{ program_fee_items : "priced by"
+  fee_heads ||--o{ program_fee_items : "used in"
+  academic_sessions ||--o{ class_sections : "spans"
+  academic_sessions ||--o{ admission_cycles : "opens"
+  academic_sessions ||--o{ allocations : "in"
+  class_sections ||--o{ allocations : "taught in"
+  subjects ||--o{ allocations : "delivered as"
+  teachers ||--o{ allocations : "assigned"
+  designations ||--o{ teachers : "ranks"
+
+  departments {
+    int id PK
+    string name
+    string code UK
+    text about
+    string image_path
+    bigint hod_teacher_id FK
+  }
+  programs {
+    int id PK
+    int department_id FK
+    int inter_group_id FK
+    enum level "intermediate|bs"
+    string name
+    string code UK
+    tinyint duration_years
+    tinyint total_semesters
+    int seats
+    decimal min_percentage
+    boolean is_active
+  }
+  subjects {
+    int id PK
+    int program_id FK
+    tinyint term_no
+    string title
+    string code
+    tinyint credit_hours
+    boolean is_active
+  }
+  academic_sessions {
+    int id PK
+    string name UK
+    year start_year
+    year end_year
+    enum shift "morning|evening"
+    boolean is_current
+  }
+  class_sections {
+    int id PK
+    int program_id FK
+    int academic_session_id FK
+    tinyint term_no
+    char name
+    enum shift
+    int capacity
+    boolean is_active
+  }
+  allocations {
+    bigint id PK
+    int class_section_id FK
+    int subject_id FK
+    bigint teacher_id FK
+    int academic_session_id FK
+  }
+  teachers {
+    bigint id PK
+    bigint user_id FK
+    int department_id FK
+    int designation_id FK
+    string name
+    string cnic UK
+    enum teacher_type "permanent|cti|adhoc|visiting"
+    enum status
+    string qualification
+    date joining_date
+  }
+  program_eligibilities {
+    int id PK
+    int program_id FK
+    int inter_group_id FK
+  }
+  fee_heads {
+    int id PK
+    string name
+    boolean is_refundable
+  }
+  program_fee_items {
+    int id PK
+    int program_id FK
+    int fee_head_id FK
+    decimal amount
+  }
+  designations {
+    int id PK
+    string title UK
+  }
+  inter_groups {
+    int id PK
+    string name UK
+  }

@@ -1,0 +1,22 @@
+flowchart LR
+  classDef io fill:#dff0d8,stroke:#3c763d
+  classDef dec fill:#fdf2e3,stroke:#b7791f
+  classDef proc fill:#eef3fb,stroke:#31708f
+
+  A([Start<br/>generateMeritList]):::io
+  B["Read cycle and program;<br/>listNo = last + 1"]:::proc
+  C{"Pool of verified +<br/>waitlisted applications<br/>is empty?"}:::dec
+  D([422 No verified<br/>applications available]):::io
+  E["For each application:<br/>apply Hafiz bonus to matric<br/>obtained, capped at total"]:::proc
+  F{"program.level =<br/>intermediate?"}:::dec
+  G["score = matric %"]:::proc
+  H["score = 0.30 x matric %<br/>+ 0.70 x inter %<br/>(weights per cycle or setting)"]:::proc
+  I["Sort descending:<br/>1. merit score<br/>2. inter %<br/>3. matric %<br/>4. earlier date of birth<br/>5. lower application no"]:::proc
+  J([Ranked list passed to the<br/>list-creation phase<br/>continued in the next figure]):::io
+
+  A --> B --> C
+  C -- yes --> D
+  C -- no --> E --> F
+  F -- yes --> G --> I
+  F -- no --> H --> I
+  I --> J

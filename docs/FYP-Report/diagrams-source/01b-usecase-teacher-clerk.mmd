@@ -1,0 +1,49 @@
+%%{init: {'flowchart': {'nodeSpacing': 8, 'rankSpacing': 90, 'padding': 4}}}%%
+graph LR
+  classDef actor fill:#dff0d8,stroke:#3c763d,stroke-width:2px
+  classDef uc fill:#eef3fb,stroke:#31708f
+
+  TEA([Teacher]):::actor
+  HOD([HOD]):::actor
+  CLK([Clerk]):::actor
+
+  subgraph SYS[Online College Management System]
+    U1(["Mark Class Attendance"]):::uc
+    U2(["Enter Assessment Marks"]):::uc
+    U3(["Publish Classwork and Quizzes"]):::uc
+    U4(["Grade Submissions"]):::uc
+    U5(["View Department Faculty and Load"]):::uc
+    U6(["Verify Application Documents"]):::uc
+    U7(["Approve or Reject Application"]):::uc
+    U8(["Generate Merit List"]):::uc
+    U9(["Publish Merit List"]):::uc
+    U10(["Verify Paid Challan"]):::uc
+    U11(["Enrol Student and Issue Roll No"]):::uc
+    U12(["Assign Class Shift"]):::uc
+    U13(["Promote Batch"]):::uc
+    U14(["Manage Carry Papers"]):::uc
+    U15(["Set Student Status"]):::uc
+    U16(["Manage Academic Structure"]):::uc
+    U17(["Manage Teacher Records"]):::uc
+    U18(["Publish Notices"]):::uc
+  end
+
+  TEA --- U1
+  TEA --- U2
+  TEA --- U3
+  TEA --- U4
+  HOD --- U5
+  HOD --- U1
+  U6 --- CLK
+  U7 --- CLK
+  U8 --- CLK
+  U9 --- CLK
+  U10 --- CLK
+  U11 --- CLK
+  U12 --- CLK
+  U13 --- CLK
+  U14 --- CLK
+  U15 --- CLK
+  U16 --- CLK
+  U17 --- CLK
+  U18 --- CLK

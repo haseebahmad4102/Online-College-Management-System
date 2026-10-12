@@ -1,0 +1,44 @@
+sequenceDiagram
+  autonumber
+  actor T as Teacher
+  participant UI as MyClasses.jsx
+  participant API as attendance.routes.js
+  participant ST as settings.service
+  participant DB as MySQL (Prisma)
+  actor S as Student
+
+  T->>UI: Open "My Classes"
+  UI->>API: GET /api/attendance/my-classes
+  API->>DB: allocations WHERE teacher_id = current teacher
+  API-->>UI: allocations (subject + class section)
+
+  T->>UI: Pick an allocation and a date
+  UI->>API: GET /api/attendance/sheet?allocationId&date
+  API->>DB: find or prepare attendance_sheet
+  API->>DB: students WHERE class_section_id AND status = 'active'
+  Note over API,DB: Only active students appear — inactive and<br/>struck-off students are excluded from the register
+  API-->>UI: sheet + student roll with existing marks
+
+  T->>UI: Mark each student present / absent / leave
+  UI->>API: POST /api/attendance/sheet
+  API->>ST: getNumber('attendance.lock_after_days', 2)
+  alt sheet older than lock window and already locked
+    API-->>T: 422 "Sheet is locked — ask the principal to unlock"
+  else editable
+    API->>DB: upsert attendance_sheet
+    API->>DB: upsert attendance_records for every student
+    API-->>T: saved
+  end
+
+  opt Principal unlocks a locked sheet
+    participant P as Principal
+    P->>API: PUT /api/attendance/sheet/:id/unlock
+    API->>DB: attendance_sheets.is_locked = false
+  end
+
+  S->>UI: Open "Attendance"
+  UI->>API: GET /api/attendance/mine
+  API->>DB: attendance_records WHERE student_id
+  API->>ST: getNumber('attendance.short_pct', 75)
+  API->>API: percentage = present / total * 100
+  API-->>S: per-subject percentage + short-attendance warning

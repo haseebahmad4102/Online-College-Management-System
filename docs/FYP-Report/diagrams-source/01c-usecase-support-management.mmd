@@ -1,0 +1,46 @@
+%%{init: {'flowchart': {'nodeSpacing': 8, 'rankSpacing': 90, 'padding': 4}}}%%
+graph LR
+  classDef actor fill:#dff0d8,stroke:#3c763d,stroke-width:2px
+  classDef uc fill:#eef3fb,stroke:#31708f
+
+  LIB([Librarian]):::actor
+  TTB([Timetable In-charge]):::actor
+  PRI([Principal]):::actor
+  ADM([Admin]):::actor
+
+  subgraph SYS[Online College Management System]
+    U1(["Maintain Book Catalogue"]):::uc
+    U2(["Approve Book Requests"]):::uc
+    U3(["Issue and Return Books"]):::uc
+    U4(["Settle Overdue Fines"]):::uc
+    U5(["Manage Blocks and Rooms"]):::uc
+    U6(["Manage Time Slots"]):::uc
+    U7(["Build Weekly Timetable"]):::uc
+    U8(["Resolve Scheduling Conflicts"]):::uc
+    U9(["View Dashboards and Statistics"]):::uc
+    U10(["Unlock Attendance Sheet"]):::uc
+    U11(["Configure System Settings"]):::uc
+    U12(["Manage Website Content"]):::uc
+    U13(["Manage Roles and Permissions"]):::uc
+    U14(["Create Staff Accounts"]):::uc
+    U15(["Assign Heads of Department"]):::uc
+    U16(["View Audit Logs"]):::uc
+  end
+
+  LIB --- U1
+  LIB --- U2
+  LIB --- U3
+  LIB --- U4
+  TTB --- U5
+  TTB --- U6
+  TTB --- U7
+  TTB --- U8
+  U9 --- PRI
+  U10 --- PRI
+  U11 --- PRI
+  U12 --- PRI
+  U16 --- PRI
+  U13 --- ADM
+  U14 --- ADM
+  U15 --- ADM
+  U16 --- ADM

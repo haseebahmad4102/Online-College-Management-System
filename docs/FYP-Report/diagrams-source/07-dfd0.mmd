@@ -1,0 +1,38 @@
+graph LR
+  classDef ext fill:#dff0d8,stroke:#3c763d,stroke-width:2px
+  classDef proc fill:#eef3fb,stroke:#31708f,stroke-width:3px
+
+  APP([Applicant]):::ext
+  STU([Student]):::ext
+  TEA([Teacher/HOD]):::ext
+  CLK([Clerk]):::ext
+  LIB([Librarian]):::ext
+  TTB([Timetable In-charge]):::ext
+  MGT([Principal/Admin]):::ext
+  BANK([Bank]):::ext
+
+  SYS((0<br/><br/>Online College<br/>Management System<br/>OCMS)):::proc
+
+  APP -->|application, documents, fee proof| SYS
+  SYS -->|merit position, challan, admission status| APP
+
+  STU -->|classwork submission, quiz answers, book request| SYS
+  SYS -->|attendance, marks, timetable, fee status, student card| STU
+
+  TEA -->|attendance marking, marks entry, classwork| SYS
+  SYS -->|class lists, allocations, department load| TEA
+
+  CLK -->|document verification, merit generation, challan verification, promotion| SYS
+  SYS -->|verification queue, merit lists, student records| CLK
+
+  LIB -->|catalogue updates, issue and return| SYS
+  SYS -->|requests, overdue list, fine amounts| LIB
+
+  TTB -->|blocks, rooms, slots, timetable entries| SYS
+  SYS -->|conflict warnings, published timetable| TTB
+
+  MGT -->|settings, permissions, staff accounts| SYS
+  SYS -->|dashboards, audit trail, statistics| MGT
+
+  SYS -->|printed challan| BANK
+  BANK -->|paid counterfoil| CLK

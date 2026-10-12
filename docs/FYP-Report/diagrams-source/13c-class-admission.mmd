@@ -1,0 +1,42 @@
+classDiagram
+  direction TB
+
+  class Application {
+    +BigInt id
+    +String applicationNo
+    +Boolean isHafiz
+    +Decimal meritScore
+    +ApplicationStatus status
+    +checkEligibility() Result
+    +computeMeritScore() Decimal
+  }
+
+  class MeritList {
+    +Int id
+    +Int listNo
+    +Int seats
+    +generate() MeritListEntry[]
+    +publish() void
+  }
+
+  class Challan {
+    +BigInt id
+    +String challanNo
+    +ChallanPurpose purpose
+    +Decimal totalAmount
+    +ChallanStatus status
+    +verify(clerkId) Student
+  }
+
+  class Program {
+    «see Fig 3.7»
+  }
+
+  class Student {
+    «see Fig 3.10»
+  }
+
+  MeritList "1" -- "*" Application : ranks
+  Application "*" -- "1" Program : applies to
+  Application "1" -- "0..1" Student : becomes
+  Application "1" -- "*" Challan : billed by

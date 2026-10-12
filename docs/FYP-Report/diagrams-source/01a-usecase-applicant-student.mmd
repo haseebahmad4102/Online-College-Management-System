@@ -1,0 +1,40 @@
+%%{init: {'flowchart': {'nodeSpacing': 8, 'rankSpacing': 90, 'padding': 4}}}%%
+graph LR
+  classDef actor fill:#dff0d8,stroke:#3c763d,stroke-width:2px
+  classDef uc fill:#eef3fb,stroke:#31708f
+
+  APP([Applicant]):::actor
+  STU([Student]):::actor
+
+  subgraph SYS[Online College Management System]
+    U1(["Register Account"]):::uc
+    U2(["Submit Online Application"]):::uc
+    U3(["Upload Required Documents"]):::uc
+    U4(["View Merit Position"]):::uc
+    U5(["Download Fee Challan"]):::uc
+    U6(["Change Password"]):::uc
+    U7(["View Attendance and Shortage"]):::uc
+    U8(["View Assessment Marks"]):::uc
+    U9(["Submit Classwork"]):::uc
+    U10(["Attempt Online Quiz"]):::uc
+    U11(["View Weekly Timetable"]):::uc
+    U12(["View Fee History"]):::uc
+    U13(["Request Library Book"]):::uc
+    U14(["Print Student Card"]):::uc
+  end
+
+  APP --- U1
+  APP --- U2
+  APP --- U3
+  APP --- U4
+  APP --- U5
+  APP --- U6
+  U7 --- STU
+  U8 --- STU
+  U9 --- STU
+  U10 --- STU
+  U11 --- STU
+  U12 --- STU
+  U13 --- STU
+  U14 --- STU
+  U6 --- STU

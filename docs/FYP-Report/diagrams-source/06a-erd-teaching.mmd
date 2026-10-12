@@ -1,0 +1,66 @@
+erDiagram
+  allocations ||--o{ attendance_sheets : "registers"
+  attendance_sheets ||--o{ attendance_records : "contains"
+  students ||--o{ attendance_records : "marked in"
+  allocations ||--o{ assessments : "assessed by"
+  assessments ||--o{ assessment_marks : "awards"
+  students ||--o{ assessment_marks : "scores"
+  allocations ||--o{ classworks : "sets"
+  classworks ||--o{ classwork_submissions : "receives"
+  students ||--o{ classwork_submissions : "submits"
+  allocations ||--o{ lectures : "records"
+
+  attendance_sheets {
+    bigint id PK
+    bigint allocation_id FK
+    date date
+    bigint marked_by FK
+    datetime locked_at "null while open"
+    datetime created_at "starts the 24h window"
+  }
+  attendance_records {
+    bigint id PK
+    bigint attendance_sheet_id FK
+    bigint student_id FK
+    enum status "present|absent|leave"
+  }
+  assessments {
+    bigint id PK
+    bigint allocation_id FK
+    enum type "quiz|assignment|mid|final|practical"
+    string title
+    decimal max_marks
+    boolean is_published
+  }
+  assessment_marks {
+    bigint id PK
+    bigint assessment_id FK
+    bigint student_id FK
+    decimal obtained
+  }
+  classworks {
+    bigint id PK
+    bigint allocation_id FK
+    enum type "assignment|quiz|material"
+    string title
+    datetime due_at
+    boolean is_published
+    json questions "answers never sent before submission"
+  }
+  classwork_submissions {
+    bigint id PK
+    bigint classwork_id FK
+    bigint student_id FK
+    string file_path
+    json answers
+    decimal score
+  }
+  lectures {
+    bigint id PK
+    bigint allocation_id FK
+    string title
+    string youtube_id "11 chars, never listed"
+    int duration_mins
+    boolean is_published
+    bigint posted_by FK
+  }

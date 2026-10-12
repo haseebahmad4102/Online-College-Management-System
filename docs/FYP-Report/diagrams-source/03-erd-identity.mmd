@@ -1,0 +1,89 @@
+erDiagram
+  users ||--o{ user_roles : "holds"
+  roles ||--o{ user_roles : "granted to"
+  roles ||--o{ role_has_permissions : "holds"
+  permissions ||--o{ role_has_permissions : "granted to"
+  users ||--o{ user_has_permissions : "holds directly"
+  permissions ||--o{ user_has_permissions : "granted to"
+  users ||--o{ audit_logs : "performs"
+  users ||--o{ notifications : "receives"
+  users ||--o| students : "is"
+  users ||--o| teachers : "is"
+  committees ||--o{ committee_members : "has"
+  teachers ||--o{ committee_members : "serves on"
+
+  users {
+    bigint id PK
+    string name
+    string email UK
+    string phone
+    string cnic UK
+    string password
+    string avatar_path
+    boolean must_change_password
+    boolean is_active
+    datetime created_at
+    datetime updated_at
+  }
+  roles {
+    int id PK
+    string name UK "admin|principal|clerk|teacher|student|librarian|timetable|hod|applicant"
+  }
+  permissions {
+    int id PK
+    string name UK "module.action"
+    string group
+    string label
+  }
+  user_roles {
+    bigint user_id PK_FK
+    int role_id PK_FK
+  }
+  role_has_permissions {
+    int role_id PK_FK
+    int permission_id PK_FK
+  }
+  user_has_permissions {
+    bigint user_id PK_FK
+    int permission_id PK_FK
+  }
+  audit_logs {
+    bigint id PK
+    bigint user_id FK
+    string user_name
+    string user_roles
+    string method
+    string path
+    string action
+    int status
+    json summary
+    string ip
+    datetime created_at
+  }
+  notifications {
+    bigint id PK
+    bigint user_id FK
+    string type
+    string title
+    text body
+    string link
+    boolean is_read
+    datetime created_at
+  }
+  settings {
+    int id PK
+    string key UK
+    text value
+    string group
+  }
+  committees {
+    int id PK
+    string name
+    string purpose
+  }
+  committee_members {
+    int id PK
+    int committee_id FK
+    bigint teacher_id FK
+    string role
+  }

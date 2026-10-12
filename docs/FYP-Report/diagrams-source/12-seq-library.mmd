@@ -1,0 +1,52 @@
+sequenceDiagram
+  autonumber
+  actor S as Student
+  participant UI as StudentLibrary.jsx
+  participant API as library.routes.js
+  participant FN as fine.service
+  participant ST as settings.service
+  participant DB as MySQL (Prisma)
+  actor L as Librarian
+
+  S->>UI: Browse catalogue and request a book
+  UI->>API: POST /api/library/requests { bookId }
+  API->>ST: getNumber('library.max_books', 2)
+  API->>DB: count current issues for this student
+  alt borrowing limit reached
+    API-->>S: 422 "You already hold the maximum number of books"
+  else within limit
+    API->>DB: create book_request (status = pending)
+    API-->>L: appears in the requests queue
+  end
+
+  L->>API: PUT /api/library/requests/:id/approve
+  API->>DB: book_requests.status = approved
+
+  L->>API: POST /api/library/issues { bookId, studentId }
+  API->>ST: getNumber('library.max_days', 14)
+  API->>ST: getNumber('library.fine_per_day', 10)
+  API->>DB: BEGIN TRANSACTION
+  API->>DB: create book_issue (due_date = today + max_days)
+  Note over API,DB: fine_per_day is snapshotted onto the issue row,<br/>so later rate changes never alter past loans
+  API->>DB: books.available_copies -= 1
+  API->>DB: COMMIT
+  API-->>S: notification "Book issued, due on <date>"
+
+  S->>L: Return the book
+  L->>API: PUT /api/library/issues/:id/return
+  API->>ST: getNumber('library.grace_days', 0)
+  API->>FN: computeFine(issue, returnedOn, graceDays)
+  FN->>FN: lateDays = floor((returned - due) / 1 day)
+  FN->>FN: chargeable = max(0, lateDays - graceDays)
+  FN->>FN: fine = chargeable * issue.finePerDay
+  FN-->>API: fine amount
+  API->>DB: BEGIN TRANSACTION
+  API->>DB: book_issues.returned_on, fine_amount, fine_status
+  API->>DB: books.available_copies += 1
+  API->>DB: COMMIT
+  API-->>S: notification "Returned" + fine if any
+
+  opt Fine settlement
+    L->>API: PUT /api/library/issues/:id/fine { status: paid | waived }
+    API->>DB: book_issues.fine_status updated
+  end

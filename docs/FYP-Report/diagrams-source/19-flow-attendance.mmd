@@ -1,0 +1,47 @@
+flowchart TB
+  classDef io fill:#dff0d8,stroke:#3c763d
+  classDef dec fill:#fdf2e3,stroke:#b7791f
+  classDef proc fill:#eef3fb,stroke:#31708f
+  classDef err fill:#fdecea,stroke:#a94442
+
+  A([Teacher opens My Classes,<br/>picks an allocation and a date]):::io
+  B["GET /attendance/sheet<br/>roll = active students of the section"]:::proc
+  C{"Sheet already exists?"}:::dec
+  D["Every student defaults to PRESENT"]:::proc
+  E["Existing marks are loaded"]:::proc
+  F{"locked_at set, OR more than<br/>24h since created_at?"}:::dec
+  G([Register closed —<br/>only the Principal can reopen it]):::err
+
+  H["Marking: one full-width card per student"]:::proc
+  I{"Key pressed"}:::dec
+  J["A = absent, then advance"]:::proc
+  K["L = leave, then advance"]:::proc
+  L["P = present, then advance"]:::proc
+  M["arrow right = keep present, advance"]:::proc
+  N["arrow left = step back and correct"]:::proc
+  O["up/down = change without advancing"]:::proc
+  P{"Past the last student?"}:::dec
+
+  Q["Review screen: counts per status<br/>and the list of everyone not present"]:::proc
+  R{"Teacher confirms?"}:::dec
+  S["Back to the card for any student"]:::proc
+  T["POST /attendance/sheet"]:::proc
+  U["Server re-checks the 24h window"]:::proc
+  V["Upsert one record per student<br/>inside a transaction"]:::proc
+  W([Saved — correctable for 24h<br/>from the moment it was first marked]):::io
+
+  A --> B --> C
+  C -- no --> D --> F
+  C -- yes --> E --> F
+  F -- yes --> G
+  F -- no --> H --> I
+  I --> J --> P
+  I --> K --> P
+  I --> L --> P
+  I --> M --> P
+  I --> N --> H
+  I --> O --> H
+  P -- no --> H
+  P -- yes --> Q --> R
+  R -- no --> S --> H
+  R -- yes --> T --> U --> V --> W

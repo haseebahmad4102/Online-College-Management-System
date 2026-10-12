@@ -1,0 +1,49 @@
+classDiagram
+  direction TB
+
+  class User {
+    +BigInt id
+    +String name
+    +String email
+    +String password
+    +Boolean mustChangePassword
+    +Boolean isActive
+    +authenticate(token) User
+    +can(permission) Boolean
+  }
+
+  class Role {
+    +Int id
+    +String name
+  }
+
+  class Permission {
+    +Int id
+    +String name
+    +String group
+    +String label
+  }
+
+  class AuditLog {
+    +BigInt id
+    +String method
+    +String path
+    +String action
+    +Int status
+    +String ip
+  }
+
+  class Student {
+    «see Fig 3.10»
+  }
+
+  class Teacher {
+    «see Fig 3.8»
+  }
+
+  User "1" -- "*" Role : holds
+  Role "*" -- "*" Permission : granted
+  User "1" -- "*" Permission : direct grant
+  User "1" -- "*" AuditLog : performs
+  User "1" -- "0..1" Student : is
+  User "1" -- "0..1" Teacher : is

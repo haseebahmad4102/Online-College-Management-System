@@ -1,0 +1,22 @@
+flowchart LR
+  classDef io fill:#dff0d8,stroke:#3c763d
+  classDef dec fill:#fdf2e3,stroke:#b7791f
+  classDef proc fill:#eef3fb,stroke:#31708f
+
+  A([Validated jobs list from<br/>the validation phase]):::io
+  B[BEGIN TRANSACTION]:::proc
+  C[For each job]:::proc
+  D{"isFinal?"}:::dec
+  E["student.status = passed_out"]:::proc
+  F["Find or create the section at<br/>term_no + 1 with the same name,<br/>shift and capacity;<br/>reactivate it if dormant"]:::proc
+  G["student.class_section_id =<br/>target section"]:::proc
+  H["Upsert student_carry_forwards<br/>for each failed subject<br/>with status = pending"]:::proc
+  I["Deactivate any source section<br/>left with no active students"]:::proc
+  J[COMMIT]:::proc
+  K["Send notifications outside the<br/>transaction so a failed notify<br/>can never roll promotion back"]:::proc
+  L(["Return promoted, passedOut,<br/>detained and skipped[]<br/>with a reason per skipped student"]):::io
+
+  A --> B --> C --> D
+  D -- yes --> E --> I
+  D -- no --> F --> G --> H --> I
+  I --> J --> K --> L

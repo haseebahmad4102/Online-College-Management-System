@@ -1,0 +1,65 @@
+erDiagram
+  book_categories ||--o{ books : "classifies"
+  books ||--o{ book_requests : "requested"
+  students ||--o{ book_requests : "requests"
+  books ||--o{ book_issues : "issued"
+  students ||--o{ book_issues : "borrows"
+  blocks ||--o{ rooms : "houses"
+  rooms ||--o{ timetable_entries : "hosts"
+  time_slots ||--o{ timetable_entries : "schedules"
+  allocations ||--o{ timetable_entries : "placed as"
+
+  books {
+    int id PK
+    int category_id FK
+    string title
+    string author
+    string isbn
+    int total_copies
+    int available_copies
+    string shelf
+  }
+  book_requests {
+    bigint id PK
+    int book_id FK
+    bigint student_id FK
+    enum status "pending|approved|rejected|issued|cancelled"
+  }
+  book_issues {
+    bigint id PK
+    int book_id FK
+    bigint student_id FK
+    date issued_on
+    date due_date
+    date returned_on
+    decimal fine_per_day "snapshotted at issue"
+    decimal fine_amount
+    enum fine_status "none|pending|paid|waived"
+  }
+  blocks {
+    int id PK
+    string name UK
+  }
+  rooms {
+    int id PK
+    int block_id FK
+    string name
+    enum type "classroom|lab|hall"
+    int capacity
+  }
+  time_slots {
+    int id PK
+    string name
+    string start_time
+    string end_time
+    enum shift
+  }
+  timetable_entries {
+    bigint id PK
+    bigint allocation_id FK
+    int class_section_id FK
+    bigint teacher_id FK
+    int room_id FK
+    int time_slot_id FK
+    enum day "mon..sat"
+  }
